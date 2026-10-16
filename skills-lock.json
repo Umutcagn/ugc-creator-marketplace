@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "youtube-watcher": {
+      "source": "hanzoskill/youtube-watcher",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "22d5f05e7e0c0328273b4e6020575b0a9493a3ced92de7cba4ada32297f79111"
+    }
+  }
+}

@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #07080a;
+    --bg-card: #0f1117;
+    --bg-card-hover: #161822;
+    --accent-indigo: #6366f1;
+    --accent-violet: #7c3aed;
+    --accent-emerald: #10b981;
+    --accent-amber: #f59e0b;
+    --border-hairline: rgba(255, 255, 255, 0.08);
+    --border-accent: rgba(124, 58, 237, 0.4);
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: #f8fafc;
+    font-family: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-zilla-slab), "Zilla Slab", Georgia, serif;
+    letter-spacing: -0.025em;
+  }
+
+  .font-mono {
+    font-family: var(--font-mono), monospace;
+  }
+}
+
+/* Background Grid Lines Pattern with Subtle Center Focus Mask */
+.bg-grid-pattern {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at 50% 30%, white 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 30%, white 20%, transparent 80%);
+}
+
+/* Distinctive Primary Button with Velvet Violet Gradient & Glow */
+.ee-btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 24px rgba(124, 58, 237, 0.45);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ee-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.65);
+  filter: brightness(1.1);
+}
+
+/* Feature Badge Pill */
+.ee-pill-badge {
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  box-shadow: 0 0 24px rgba(124, 58, 237, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+/* Custom Editorial Glass Frame */
+.ee-card {
+  background: rgba(15, 17, 23, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+.ee-card:hover {
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+.ee-card-glow {
+  background: linear-gradient(180deg, rgba(22, 24, 34, 0.95) 0%, rgba(12, 13, 18, 0.98) 100%);
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  box-shadow: 0 0 48px rgba(99, 102, 241, 0.18);
+}
+
+/* Marquee Scroll Animation */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #07080a;
+}
+::-webkit-scrollbar-thumb {
+  background: #181a24;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
+}

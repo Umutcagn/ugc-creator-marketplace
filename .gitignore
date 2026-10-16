@@ -1,0 +1,38 @@
+# Security Guardrails
+*.env
+*.env.*
+*.key
+*.pem
+*token*
+*secret*
+*credential*
+
+# Dependencies
+**/node_modules/
+**/.pnpm-store/
+
+# Next.js Build Outputs
+**/.next/
+**/out/
+**/dist/
+**/build/
+
+# Python & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+env/
+
+# Local SQLite databases
+*.db
+*.sqlite3
+
+# Editor & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
