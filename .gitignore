@@ -36,3 +36,9 @@ env/
 .DS_Store
 Thumbs.db
 *.log
+
+# AI assistant scaffolding (local only)
+.agents/
+skills-lock.json
+**/CLAUDE.md
+**/AGENTS.md

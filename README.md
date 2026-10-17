@@ -64,6 +64,8 @@ uvicorn app.main:app --reload --port 8000
 
 Interactive API documentation will be available at `http://localhost:8000/docs`.
 
+Set `JWT_SECRET_KEY` to a long random value to keep login sessions valid across restarts (otherwise a random key is generated on each start). `DATABASE_URL` defaults to a local SQLite file.
+
 ### 2. Frontend Setup
 
 ```bash

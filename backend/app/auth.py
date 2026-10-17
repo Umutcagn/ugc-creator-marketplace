@@ -1,3 +1,5 @@
+import os
+import secrets
 from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import Depends, HTTPException, status
@@ -8,7 +10,8 @@ from sqlmodel import Session, select
 from app.database import get_session
 from app.models import User
 
-SECRET_KEY = "super-secret-ugc-marketplace-key-change-in-prod"
+# Falls back to a random per-process key in development (tokens are invalidated on restart)
+SECRET_KEY = os.getenv("JWT_SECRET_KEY") or secrets.token_urlsafe(32)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
 
