@@ -1,6 +1,10 @@
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlmodel import SQLModel, Field, Relationship
+
+
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -8,7 +12,7 @@ class User(SQLModel, table=True):
     hashed_password: str
     full_name: str
     role: str = Field(default="creator") # 'brand', 'creator', 'admin'
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
 class BrandProfile(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -43,7 +47,7 @@ class Campaign(SQLModel, table=True):
     max_creators: int = Field(default=10)
     category: str = Field(default="Genel")
     status: str = Field(default="active") # 'draft', 'active', 'completed'
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
 class Application(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -56,7 +60,7 @@ class Application(SQLModel, table=True):
     cargo_tracking_code: Optional[str] = None
     video_url: Optional[str] = None
     video_notes: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
 class WalletTransaction(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -65,4 +69,4 @@ class WalletTransaction(SQLModel, table=True):
     type: str # 'escrow_lock', 'creator_payout', 'refund'
     description: str
     status: str = Field(default="completed")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
