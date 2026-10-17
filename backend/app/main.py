@@ -2,8 +2,8 @@ from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
-from typing import List, Optional
-from pydantic import BaseModel
+from typing import List, Literal, Optional
+from pydantic import BaseModel, Field
 import os
 import uuid
 
@@ -134,7 +134,7 @@ class RegisterRequest(BaseModel):
     email: str
     password: str
     full_name: str
-    role: str # 'brand' or 'creator'
+    role: Literal["brand", "creator"]
     handle_or_company: Optional[str] = None
 
 class TokenResponse(BaseModel):
@@ -149,8 +149,8 @@ class CampaignCreateRequest(BaseModel):
     product_url: Optional[str] = None
     product_image: Optional[str] = None
     reward_type: str = "cash_and_gift"
-    cash_amount: float = 0.0
-    max_creators: int = 5
+    cash_amount: float = Field(default=0.0, ge=0)
+    max_creators: int = Field(default=5, ge=1)
     category: str = "Genel"
 
 class ApplicationCreateRequest(BaseModel):
@@ -162,6 +162,18 @@ class ApplicationStatusUpdateRequest(BaseModel):
     cargo_tracking_code: Optional[str] = None
     video_url: Optional[str] = None
     video_notes: Optional[str] = None
+
+# Allowed application status transitions per actor:
+# the campaign's brand reviews and ships, the applying creator submits the video.
+BRAND_TRANSITIONS = {
+    "pending": {"accepted", "rejected"},
+    "accepted": {"shipped"},
+    "video_submitted": {"approved"},
+}
+CREATOR_TRANSITIONS = {
+    "accepted": {"video_submitted"},
+    "shipped": {"video_submitted"},
+}
 
 # --- Routes ---
 
@@ -304,6 +316,8 @@ def create_campaign(req: CampaignCreateRequest, current_user: User = Depends(get
     )
     session.add(escrow_tx)
     session.commit()
+    # The second commit expires `camp`; reload it so the response is not an empty object
+    session.refresh(camp)
 
     return camp
 
@@ -365,7 +379,20 @@ def update_application_status(
     app_entry = session.exec(select(Application).where(Application.id == app_id)).first()
     if not app_entry:
         raise HTTPException(status_code=404, detail="Başvuru bulunamadı.")
-    
+
+    camp = session.exec(select(Campaign).where(Campaign.id == app_entry.campaign_id)).first()
+    if current_user.role == "brand" and camp and camp.brand_id == current_user.id:
+        allowed = BRAND_TRANSITIONS.get(app_entry.status, set())
+    elif current_user.role == "creator" and app_entry.creator_id == current_user.id:
+        allowed = CREATOR_TRANSITIONS.get(app_entry.status, set())
+    else:
+        raise HTTPException(status_code=403, detail="Bu başvuru üzerinde yetkiniz yok.")
+    if req.status not in allowed:
+        raise HTTPException(
+            status_code=400,
+            detail=f"'{app_entry.status}' durumundan '{req.status}' durumuna geçiş yapılamaz.",
+        )
+
     app_entry.status = req.status
     if req.cargo_company:
         app_entry.cargo_company = req.cargo_company
@@ -381,8 +408,7 @@ def update_application_status(
 
     # If status is approved, transfer payout to creator
     if req.status == "approved":
-        camp = session.exec(select(Campaign).where(Campaign.id == app_entry.campaign_id)).first()
-        payout_amount = camp.cash_amount if camp else 500.0
+        payout_amount = camp.cash_amount if camp else 0.0
         payout = WalletTransaction(
             user_id=app_entry.creator_id,
             amount=payout_amount,
@@ -395,7 +421,7 @@ def update_application_status(
     return app_entry
 
 @app.post("/api/upload")
-async def upload_media(file: UploadFile = File(...)):
+async def upload_media(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
     # Mock Cloudflare R2 / S3 Presigned Direct Upload
     filename = f"{uuid.uuid4().hex}_{file.filename}"
     # In real R2 setup, this returns presigned URL or uploads to R2 bucket
